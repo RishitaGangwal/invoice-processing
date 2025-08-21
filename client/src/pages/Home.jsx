@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box,  Typography } from "@mui/material";
 import Header from "../components/Header";
 import AddInvoice from "../components/AddInvoice";
 import Invoices from "../components/Invoices";
@@ -30,10 +30,6 @@ const Home = () => {
 
   const HeaderContainer = styled(Box)(({ theme }) => ({
     marginBottom: "28px",
-    // padding: "24px",
-    // background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-    // borderRadius: "16px",
-    // border: "1px solid rgba(0, 0, 0, 0.05)",
   }));
 
   return (
@@ -62,15 +58,6 @@ const Home = () => {
             Stay updated on all pending and overdue invoices!
           </Typography>
         </HeaderContainer>
-        {/* {!addInvoice && (
-          <Button
-            variant="contained"
-            style={{ marginTop: 1, marginBottom: 15 }}
-            onClick={() => toggleInvoice()}
-          >
-            Add Invoice
-          </Button>
-        )} */}
         {addInvoice && <AddInvoice setAddInvoice={setAddInvoice} />}
         <Box>
           <Invoices invoices={invoices} removeInvoice={removeInvoice} />

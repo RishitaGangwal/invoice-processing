@@ -1,16 +1,14 @@
-
-import { AppBar, Toolbar } from '@mui/material';
-
+import { AppBar, Toolbar } from "@mui/material";
 const Header = () => {
-    const logo = "https://dashboard.getinvoice.co/dboard/img/logo.png";
-    
-    return (
-        <AppBar position="static" color="transparent">
-            <Toolbar>
-                <img src={logo} alt="logo" style={{ width: 120 }} />
-            </Toolbar>
-        </AppBar>
-    )
-}
+  const logo = "https://dashboard.getinvoice.co/dboard/img/logo.png";
+
+  return (
+    <AppBar position="static" color="transparent">
+      <Toolbar>
+        <img src={logo} alt="logo" style={{ width: 120 }} />
+      </Toolbar>
+    </AppBar>
+  );
+};
 
 export default Header;

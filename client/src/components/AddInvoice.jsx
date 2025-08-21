@@ -2,6 +2,8 @@ import { Box, Button, TextField, Typography, styled } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { saveInvoice } from "../services/api";
 import { User, Package, IndianRupee, Calendar, X, Receipt } from "lucide-react";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 const ModalBackdrop = styled(Box)({
   position: "fixed",
@@ -15,28 +17,40 @@ const ModalBackdrop = styled(Box)({
   alignItems: "center",
   justifyContent: "center",
   zIndex: 1300,
-  padding: "20px",
+  padding: "8px",
+
+  "@media (max-width: 600px)": {
+    padding: "4px",
+  },
 });
 
 const Component = styled(Box)({
   width: "100%",
   maxWidth: "680px",
   maxHeight: "90vh",
-  overflowY: "auto",
   margin: "0 auto",
-  padding: 0,
+  padding: "0",
   backgroundColor: "#ffffff",
   borderRadius: "24px",
   boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
   position: "relative",
   outline: "none",
+  display: "flex",
+  flexDirection: "column",
+
+  "@media (max-width: 600px)": {
+    maxWidth: "90%",
+    margin: "8px",
+    padding: "4px",
+  },
 
   "& .modal-header": {
-    padding: "32px 32px 24px 32px",
+    padding: "16px 16px 12px 16px",
     background: "linear-gradient(135deg, #1976d2 0%, #1565c0 100%)",
     borderRadius: "24px 24px 0 0",
     position: "relative",
     color: "white",
+    flexShrink: 0,
 
     "& .header-content": {
       display: "flex",
@@ -46,10 +60,10 @@ const Component = styled(Box)({
       "& .title-section": {
         display: "flex",
         alignItems: "center",
-        gap: "12px",
+        gap: "8px",
 
         "& .icon-container": {
-          padding: "12px",
+          padding: "8px",
           backgroundColor: "rgba(255, 255, 255, 0.2)",
           borderRadius: "16px",
           backdropFilter: "blur(10px)",
@@ -69,11 +83,15 @@ const Component = styled(Box)({
           textAlign: "left",
           paddingBottom: 0,
           border: "none",
+
+          "@media (max-width: 600px)": {
+            fontSize: "1.2rem",
+          },
         },
       },
 
       "& .close-button": {
-        padding: "10px",
+        padding: "6px",
         borderRadius: "12px",
         backgroundColor: "transparent",
         border: "none",
@@ -94,6 +112,10 @@ const Component = styled(Box)({
           cursor: "not-allowed",
           transform: "none",
         },
+
+        "@media (max-width: 600px)": {
+          padding: "4px",
+        },
       },
     },
 
@@ -110,13 +132,20 @@ const Component = styled(Box)({
   },
 
   "& .modal-body": {
-    padding: "32px",
+    padding: "16px",
+    flexGrow: 1,
+    overflowY: "hidden",
 
     "& .form-container": {
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-      gap: "28px",
+      gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+      gap: "16px",
       alignItems: "end",
+
+      "@media (max-width: 600px)": {
+        gridTemplateColumns: "1fr",
+        gap: "12px",
+      },
 
       "& .field-container": {
         position: "relative",
@@ -189,22 +218,36 @@ const Component = styled(Box)({
           "&.Mui-focused": {
             backgroundColor: "rgba(25, 118, 210, 0.04)",
           },
+
+          "@media (max-width: 600px)": {
+            padding: "8px 0",
+            "& input": {
+              padding: "8px 0 4px 0",
+            },
+          },
         },
       },
     },
   },
 
   "& .modal-footer": {
-    padding: "24px 32px 32px 32px",
+    padding: "12px 16px 16px 16px",
     backgroundColor: "#f8f9fa",
     borderRadius: "0 0 24px 24px",
     borderTop: "1px solid rgba(0, 0, 0, 0.06)",
+    flexShrink: 0,
 
     "& .button-container": {
       display: "flex",
       justifyContent: "flex-end",
-      marginTop: 0,
-      gap: "16px",
+      marginTop: "0",
+      gap: "8px",
+
+      "@media (max-width: 600px)": {
+        flexDirection: "column",
+        gap: "8px",
+        alignItems: "flex-end",
+      },
 
       "& button": {
         background: "linear-gradient(135deg, #1976d2 0%, #1565c0 100%)",
@@ -246,6 +289,11 @@ const Component = styled(Box)({
           transform: "none",
           cursor: "not-allowed",
         },
+
+        "@media (max-width: 600px)": {
+          minWidth: "100%",
+          padding: "12px 16px",
+        },
       },
     },
   },
@@ -262,6 +310,8 @@ const defaultObj = {
 const AddInvoice = ({ setAddInvoice, open = true }) => {
   const [invoice, setInvoice] = useState(defaultObj);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -286,14 +336,34 @@ const AddInvoice = ({ setAddInvoice, open = true }) => {
       setInvoice(defaultObj);
       setAddInvoice(false);
     } catch (error) {
-      console.error("Error saving invoice:", error);
+      if (error.response && error.response.status === 409) {
+        setErrorMessage(
+          error.response.data?.message || "Duplicate invoice detected!"
+        );
+        setSnackbarOpen(true);
+      } else {
+        setErrorMessage("Failed to save invoice.");
+        setSnackbarOpen(true);
+      }
     } finally {
       setLoading(false);
+    }
+    if (
+      !invoice.vendor ||
+      !invoice.product ||
+      !invoice.amount ||
+      !invoice.date
+    ) {
+      setErrorMessage("All fields are required");
+      setSnackbarOpen(true);
+      return;
     }
   };
 
   const handleClose = () => {
     setInvoice(defaultObj);
+    setErrorMessage("");
+    setSnackbarOpen(false);
     setAddInvoice(false);
   };
 
@@ -303,10 +373,15 @@ const AddInvoice = ({ setAddInvoice, open = true }) => {
     }
   };
 
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") return;
+    setSnackbarOpen(false);
+  };
+
   if (!open) return null;
 
   return (
-    <ModalBackdrop onClick={handleBackdropClick}>
+    <ModalBackdrop>
       <Component onClick={(e) => e.stopPropagation()}>
         <Box className="modal-header">
           <Box className="header-content">
@@ -343,7 +418,9 @@ const AddInvoice = ({ setAddInvoice, open = true }) => {
                 value={invoice.vendor}
                 fullWidth
                 disabled={loading}
-                autocomplete="off"
+                autoComplete="off"
+                inputProps={{ autoComplete: "off" }}
+                required
               />
             </Box>
 
@@ -362,7 +439,9 @@ const AddInvoice = ({ setAddInvoice, open = true }) => {
                 value={invoice.product}
                 fullWidth
                 disabled={loading}
-                autocomplete="off"
+                autoComplete="off"
+                inputProps={{ autoComplete: "off" }}
+                required
               />
             </Box>
 
@@ -382,7 +461,9 @@ const AddInvoice = ({ setAddInvoice, open = true }) => {
                 value={invoice.amount}
                 fullWidth
                 disabled={loading}
-                autocomplete="off"
+                autoComplete="off"
+                inputProps={{ autoComplete: "off" }}
+                required
               />
             </Box>
 
@@ -400,9 +481,11 @@ const AddInvoice = ({ setAddInvoice, open = true }) => {
                 onChange={(e) => onValueChange(e)}
                 name="date"
                 value={invoice.date}
-                               fullWidth
+                fullWidth
                 disabled={loading}
-                autocomplete="off"
+                autoComplete="off"
+                inputProps={{ autoComplete: "off" }}
+                required
               />
             </Box>
           </Box>
@@ -428,6 +511,30 @@ const AddInvoice = ({ setAddInvoice, open = true }) => {
           </Box>
         </Box>
       </Component>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        sx={{
+          "& .MuiSnackbarContent-root": {
+            width: "90%",
+            maxWidth: "500px",
+            "@media (max-width: 600px)": {
+              width: "95%",
+              maxWidth: "100%",
+            },
+          },
+        }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </ModalBackdrop>
   );
 };
