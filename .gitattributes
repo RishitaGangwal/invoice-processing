@@ -1,5 +1,2 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-
-# Mark JavaScript files as generated to deprioritize them
-*.js linguist-generated
