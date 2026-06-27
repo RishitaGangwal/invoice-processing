@@ -78,74 +78,75 @@ npm start
 
 Frontend runs at:
 http://localhost:3000
-
 ---
 
 ## 🔐 Authentication Flow
 
-1. User signs up or logs in
-2. Server generates JWT token
-3. Token stored in frontend
-4. Token sent in every request:
+1. Client sends login request (if authentication is implemented)
+2. Server generates JWT token (if applicable)
+3. Token is stored in frontend/local storage
+4. Token is sent in every request:
 
 Authorization: Bearer <token>
 
-5. Backend validates token before allowing access
+5. Backend validates token before allowing access to protected APIs
 
 ---
 
 ## 📁 Project Structure
 
 Backend:
-- Controller → APIs
-- Service → Business logic
-- Repository → DB layer
-- Entity → Models
-- Security → JWT config
-
-Frontend:
-- Pages → Login, Signup, Onboarding
-- Components → UI forms
-- Services → API calls
+- Controller → Handles API endpoints
+- Service → Business logic layer
+- Repository → Database layer (JPA)
+- Entity → Database models
 
 ---
 
 ## 🔌 API Endpoints
 
-Auth:
-- POST /signup
-- POST /login
+Invoices:
 
-Onboarding:
-- POST /user/basic
-- POST /user/verify
-- POST /user/cards
+- POST /api/invoices → Create new invoice
+- GET /api/invoices → Get all invoices
+- GET /api/invoices/{id} → Get invoice by ID
+- PUT /api/invoices/{id} → Update invoice
+- DELETE /api/invoices/{id} → Delete invoice
 
-Cards:
-- GET /user/cards
+Customers (if applicable):
+
+- POST /api/customers → Create customer
+- GET /api/customers → Get all customers
+- GET /api/customers/{id} → Get customer by ID
 
 ---
 
 ## 🔒 Security Features
 
-- JWT authentication
-- BCrypt password hashing
-- Protected routes
-- OTP verification flow
+- (Optional) JWT-based authentication if implemented
+- Password hashing using BCrypt (if user module exists)
+- Role-based access control (future scope)
+- Secure REST API structure
 
 ---
 
 ## 🚀 Future Improvements
 
-- Email OTP system
-- Refresh tokens
-- Role-based access (Admin/User)
-- Payment integration
-- Docker deployment
-- Better UI
+- PDF invoice generation
+- Email invoice delivery
+- Authentication & Authorization module
+- Admin dashboard UI
+- Payment gateway integration
+- Advanced reporting & analytics
 
 ---
 
 ## 👩‍💻 Author
 
-Rishita Gangwal
+Your Name
+
+---
+
+## ⭐ Note
+
+This project is built for learning purposes to demonstrate Spring Boot, JPA-Hibernate, and REST API design for an Invoice Management System.
